@@ -7,51 +7,91 @@ import * as FingerprintJS from '@fingerprintjs/fingerprintjs';
 export default function Home() {
   // State to store the fingerprint
   const [fingerprint, setFingerprint] = useState<string | null>(null);
-  
   const [screenResolution, setScreenResolution] = useState<string | null>(null);
   const [timezone, setTimezone] = useState<string | null>(null);
   const [orientation, setOrientation] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   const loadFingerprint = async () => {
+  //     const fp = await FingerprintJS.load();
+  //     const result = await fp.get();
+  //     const typedResult = result as any;
+  //     console.log(typedResult);
+  //     const width = typedResult.components.screenResolution.value[0];
+  //     const height = typedResult.components.screenResolution.value[1];
+  //     const orientation = width > height ? 'Landscape' : 'Portrait';
+    
+  // // Calculate the actual aspect ratio
+  // const actualRatio = width / height;
+
+  // // List of common aspect ratios
+  // const commonRatios = [
+  //   { name: '4/3', value: 4 / 3 },
+  //   { name: '16/9', value: 16 / 9 },
+  //   { name: '16/10', value: 16 / 10 },
+  //   { name: '1/1', value: 1 }, // Square screens
+  //   { name: '21/9', value: 21 / 9 }, // Ultrawide monitors
+  //   { name: '32/9', value: 32 / 9 }, // Super ultrawide monitors
+  //   { name: '5/4', value: 5 / 4 }, // Older monitors
+  //   { name: '3/2', value: 3 / 2 }, // Some tablets, mobile devices, and laptops
+  //   { name: '2/1', value: 2 }, // Some mobile devices
+  // ];
+
+  // // Find the common ratio that is closest to the actual ratio
+  // const closestRatio = commonRatios.reduce((prev, curr) =>
+  //   Math.abs(curr.value - actualRatio) < Math.abs(prev.value - actualRatio) ? curr : prev
+  // );
+
+  //     setScreenResolution(`${typedResult.components.screenResolution.value[0]}x${typedResult.components.screenResolution.value[1]}`);
+  //     setFingerprint(typedResult.visitorId);
+  //     setOrientation(orientation);
+  //     setTimezone(typedResult.components.timezone.value);
+  //     setAspectRatio(closestRatio.name);
+  //   };
+  //   loadFingerprint();
+  // }, []); 
+
   useEffect(() => {
     const loadFingerprint = async () => {
-      const fp = await FingerprintJS.load();
-      const result = await fp.get();
-      const typedResult = result as any;
-      console.log(typedResult);
-      const width = typedResult.components.screenResolution.value[0];
-      const height = typedResult.components.screenResolution.value[1];
-      const orientation = width > height ? 'Landscape' : 'Portrait';
-    
-  // Calculate the actual aspect ratio
-  const actualRatio = width / height;
-
-  // List of common aspect ratios
-  const commonRatios = [
-    { name: '4/3', value: 4 / 3 },
-    { name: '16/9', value: 16 / 9 },
-    { name: '16/10', value: 16 / 10 },
-    { name: '1/1', value: 1 }, // Square screens
-    { name: '21/9', value: 21 / 9 }, // Ultrawide monitors
-    { name: '32/9', value: 32 / 9 }, // Super ultrawide monitors
-    { name: '5/4', value: 5 / 4 }, // Older monitors
-    { name: '3/2', value: 3 / 2 }, // Some tablets, mobile devices, and laptops
-    { name: '2/1', value: 2 }, // Some mobile devices
-  ];
-
-  // Find the common ratio that is closest to the actual ratio
-  const closestRatio = commonRatios.reduce((prev, curr) =>
-    Math.abs(curr.value - actualRatio) < Math.abs(prev.value - actualRatio) ? curr : prev
-  );
-
-      setScreenResolution(`${typedResult.components.screenResolution.value[0]}x${typedResult.components.screenResolution.value[1]}`);
-      setFingerprint(typedResult.visitorId);
-      setOrientation(orientation);
-      setTimezone(typedResult.components.timezone.value);
-      setAspectRatio(closestRatio.name);
+       try {
+         const fp = await FingerprintJS.load();
+         const result = await fp.get();
+         const typedResult = result as any;
+         const width = typedResult.components.screenResolution.value[0];
+         const height = typedResult.components.screenResolution.value[1];
+   
+         // Use window.matchMedia to check the orientation
+         const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+         const orientation = isPortrait ? 'Portrait' : 'Landscape';
+   
+         const actualRatio = width / height;
+         const commonRatios = [
+           { name: '4/3', value: 4 / 3 },
+           { name: '16/9', value: 16 / 9 },
+           { name: '16/10', value: 16 / 10 },
+           { name: '1/1', value: 1 },
+           { name: '21/9', value: 21 / 9 },
+           { name: '32/9', value: 32 / 9 },
+           { name: '5/4', value: 5 / 4 },
+           { name: '3/2', value: 3 / 2 },
+           { name: '2/1', value: 2 },
+         ];
+         const closestRatio = commonRatios.reduce((prev, curr) =>
+           Math.abs(curr.value - actualRatio) < Math.abs(prev.value - actualRatio) ? curr : prev
+         );
+         setScreenResolution(`${width}x${height}`);
+         setFingerprint(typedResult.visitorId);
+         setOrientation(orientation);
+         setTimezone(typedResult.components.timezone.value);
+         setAspectRatio(closestRatio.name);
+       } catch (err) {
+         console.log('Failed to load fingerprint or device information.');
+       }
     };
     loadFingerprint();
-  }, []); 
+   }, []);
+   
 
   return (
     <main className={styles.main}>
