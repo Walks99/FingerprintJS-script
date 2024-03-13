@@ -20,6 +20,7 @@ export default function Home() {
         const fp = await FingerprintJS.load();
         const result = await fp.get();
         const typedResult = result as any;
+        console.log(typedResult);
         const width = typedResult.components.screenResolution.value[0];
         const height = typedResult.components.screenResolution.value[1];
 
