@@ -6,7 +6,32 @@
   align-items: center;
   flex-direction: column;
 
-  P {
-    font-size: 2rem;
+  .fingerprintInfoContainer {
+    .fingerprintInfoChild {
+      display: flex;
+      p {
+        font-size: 2rem;
+        &:first-child {
+          margin: 0 20px 0 0;
+        }
+        &:last-child {
+          color: lightblue;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .main {
+    .fingerprintInfoContainer {
+      .fingerprintInfoChild {
+        flex-direction: column;
+        margin-bottom: 20px;
+        p {
+          font-size: 1rem;
+        }
+      }
+    }
   }
 }
