@@ -11,9 +11,11 @@ export default function Home() {
   const [timezone, setTimezone] = useState<string | null>(null);
   const [orientation, setOrientation] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string | null>(null);
+  // State to control the visibility of the iframe
+  const [showIframe, setShowIframe] = useState<boolean>(true);
 
   useEffect(() => {
-    const loadFingerprint = async () => {
+    const loadData = async () => {
       try {
         const fp = await FingerprintJS.load();
         const result = await fp.get();
@@ -48,11 +50,19 @@ export default function Home() {
         setOrientation(orientation);
         setTimezone(typedResult.components.timezone.value);
         setAspectRatio(closestRatio.name);
+
+        // Hide the iframe after 3 seconds
+        const timer = setTimeout(() => {
+          setShowIframe(false);
+        }, 3000); // 3000 milliseconds = 3 seconds
+
+        return () => clearTimeout(timer); // Cleanup on component unmount
       } catch (err) {
         console.log("Failed to load fingerprint or device information.");
       }
     };
-    loadFingerprint();
+
+    loadData();
   }, []);
 
   return (
@@ -63,7 +73,16 @@ export default function Home() {
         width="200px"
         height="auto"
       />
-      {fingerprint ? (
+      {showIframe ? (
+        <iframe
+          src="https://giphy.com/embed/R3FUSQ5H5jzVe"
+          width="480"
+          height="333"
+          style={{border: '0'}}
+          className="giphy-embed"
+          allowFullScreen
+        ></iframe>
+      ) : (
         <div className={styles.fingerprintInfoContainer}>
           <div className={styles.fingerprintInfoChild}>
             <p>Your device fingerprint is:</p>
@@ -103,8 +122,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-      ) : (
-        <p className={styles.loadingFingerprint}>Loading fingerprint...</p>
       )}
     </main>
   );
