@@ -1,0 +1,12 @@
+.main {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+
+  P {
+    font-size: 2rem;
+  }
+}
