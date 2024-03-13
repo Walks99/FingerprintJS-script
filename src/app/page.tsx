@@ -104,7 +104,7 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <p>Loading fingerprint...</p>
+        <p className={styles.loadingFingerprint}>Loading fingerprint...</p>
       )}
     </main>
   );
